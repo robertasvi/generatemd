@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Instructions Generator</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+<main class="max-w-3xl mx-auto p-6">
+  <h1 class="text-2xl font-bold mb-1">Agent Instructions Generator</h1>
+  <p class="text-slate-600 mb-6">Pick a template, answer 3 questions, download the file.</p>
+
+  <section id="step-template" class="grid gap-3"></section>
+
+  <section id="step-questions" class="hidden">
+    <button id="back" class="text-sm text-blue-600 mb-4">&larr; Change template</button>
+    <h2 id="q-title" class="text-xl font-semibold mb-1"></h2>
+    <p id="q-hint" class="text-sm text-slate-500 mb-4"></p>
+    <form id="form" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></form>
+  </section>
+
+  <section id="step-result" class="hidden mt-6">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="font-semibold">Preview: <code id="r-path" class="bg-slate-200 px-1 rounded"></code></h2>
+      <div class="flex gap-2">
+        <button id="copy" class="px-3 py-1 rounded border border-slate-300 bg-white">Copy</button>
+        <button id="download" class="px-3 py-1 rounded bg-blue-600 text-white">Download</button>
+      </div>
+    </div>
+    <p id="r-where" class="text-sm text-slate-500 mb-2"></p>
+    <textarea id="output" rows="20" class="w-full font-mono text-sm p-3 border border-slate-300 rounded"></textarea>
+  </section>
+</main>
+
+<script>
+const slug = s => s.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'untitled';
+const lines = s => s.split('\n').map(l => l.trim().replace(/^[-*]\s*/, '')).filter(Boolean);
+const bullets = s => lines(s).map(l => `- ${l}`).join('\n');
+
+// To add a template or change questions, edit this array only.
+const TEMPLATES = [
+  {
+    id: 'agents',
+    name: 'AGENTS.md',
+    desc: 'Project-wide instructions: stack, conventions, and rules for every AI agent request.',
+    where: 'Place in the repository root (or .github/AGENTS.md).',
+    // Add agent files to /agents and list them here.
+    examples: [
+      { label: 'Financial reporting copilot', url: 'agents/agents.md' },
+    ],
+    questions: [
+      { id: 'project', label: 'What is the project and what does it do?', type: 'textarea', ph: 'Internal invoicing web app for finance team' },
+      { id: 'stack', label: 'Tech stack, build and test commands (one per line)', type: 'textarea', ph: 'TypeScript, Angular 18\nBuild: npm run build\nTest: npm test' },
+      { id: 'rules', label: 'Conventions and things the agent must or must not do (one per line)', type: 'textarea', ph: 'Use standalone components\nNever commit secrets' },
+    ],
+    file: a => ({
+      path: 'AGENTS.md',
+      // Loaded examples are full markdown (start with a heading) and are kept verbatim.
+      body: /^#\s/.test(a.rules.trim()) ? `${a.rules.trim()}\n` : `# Agent Instructions\n\n## Project Overview\n${a.project.trim()}\n\n## Tech Stack & Commands\n${bullets(a.stack)}\n\n## Conventions & Rules\n${bullets(a.rules)}\n`,
+    }),
+  },
+  {
+    id: 'skill',
+    name: 'SKILL.md',
+    desc: 'A reusable skill: a specific task the agent can perform with a defined workflow.',
+    where: 'Place in .github/skills/<skill-name>/SKILL.md.',
+    questions: [
+      { id: 'name', label: 'Skill name', type: 'text', ph: 'Create release notes' },
+      { id: 'when', label: 'When should the agent use this skill?', type: 'textarea', ph: 'When the user asks to prepare release notes or a changelog' },
+      { id: 'steps', label: 'Steps the agent should follow (one per line)', type: 'textarea', ph: 'Read merged PRs since last tag\nGroup by feature/fix\nWrite CHANGELOG entry' },
+    ],
+    file: a => ({
+      path: `skills/${slug(a.name)}/SKILL.md`,
+      body: `---\nname: ${slug(a.name)}\ndescription: ${a.when.trim().replace(/\s*\n\s*/g, ' ')}\n---\n\n# ${a.name.trim()}\n\n## When to use\n${a.when.trim()}\n\n## Steps\n${lines(a.steps).map((l, i) => `${i + 1}. ${l}`).join('\n')}\n`,
+    }),
+  },
+  {
+    id: 'rule',
+    name: '/rules/[name].instructions.md',
+    desc: 'Scoped rules applied automatically to files matching a glob pattern.',
+    where: 'Place in .github/instructions/ (or your rules folder).',
+    // Add rule files to /rules and list them here.
+    examples: [
+      { name: 'typescript-models', label: 'TypeScript models', url: 'rules/typescript-models.md' },
+      { name: 'spring-boot-models', label: 'Spring Boot models', url: 'rules/spring-boot-models.md' },
+      { name: 'spring-security-jwt', label: 'Spring Security JWT', url: 'rules/spring-security-jwt.md' },
+    ],
+    questions: [
+      { id: 'name', label: 'Rule name', type: 'text', ph: 'angular-components' },
+      { id: 'apply', label: 'Which files does it apply to? (glob)', type: 'text', ph: '**/*.component.ts' },
+      { id: 'rules', label: 'Rules to follow (one per line)', type: 'textarea', ph: 'Use signals for state\nKeep templates under 100 lines' },
+    ],
+    file: a => ({
+      path: `${slug(a.name)}.instructions.md`,
+      // Loaded examples are full markdown (start with a heading) and are kept verbatim.
+      body: `---\napplyTo: "${a.apply.trim().replace(/"/g, '\\"')}"\n---\n\n${/^#\s/.test(a.rules.trim()) ? a.rules.trim() : `# ${a.name.trim()}\n\n${bullets(a.rules)}`}\n`,
+    }),
+  },
+];
+
+const $ = id => document.getElementById(id);
+const stepT = $('step-template'), stepQ = $('step-questions'), stepR = $('step-result');
+let current = null, result = null;
+
+const field = 'w-full border border-slate-300 rounded p-2 bg-white';
+
+TEMPLATES.forEach(t => {
+  const b = document.createElement('button');
+  b.className = 'text-left p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-500';
+  b.innerHTML = `<div class="font-semibold"></div><div class="text-sm text-slate-600"></div>`;
+  b.children[0].textContent = t.name;
+  b.children[1].textContent = t.desc;
+  b.onclick = () => select(t);
+  stepT.append(b);
+});
+
+function select(t) {
+  current = t;
+  $('q-title').textContent = t.name;
+  $('q-hint').textContent = t.where;
+  const form = $('form');
+  form.innerHTML = '';
+  if (t.examples) {
+    const bar = document.createElement('div');
+    bar.className = 'flex flex-wrap items-center gap-2 sm:col-span-2';
+    bar.innerHTML = '<span class="text-sm text-slate-600">Start from an example:</span>';
+    t.examples.forEach(ex => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'px-3 py-1 text-sm rounded border border-slate-300 bg-white hover:border-blue-500';
+      b.textContent = ex.label;
+      b.onclick = () => loadExample(ex);
+      bar.append(b);
+    });
+    form.append(bar);
+  }
+  t.questions.forEach((q, i) => {
+    const wrap = document.createElement('label');
+    wrap.className = i < 2 ? 'grid gap-1 content-start' : 'grid gap-1 sm:col-span-2';
+    const span = document.createElement('span');
+    span.className = 'font-medium';
+    span.textContent = `${i + 1}. ${q.label}`;
+    const el = document.createElement(q.type === 'textarea' ? 'textarea' : 'input');
+    el.name = q.id; el.required = true; el.placeholder = q.ph; el.className = field;
+    if (q.type === 'textarea') el.rows = i === t.questions.length - 1 ? 16 : 4;
+    wrap.append(span, el);
+    form.append(wrap);
+  });
+  const go = document.createElement('button');
+  go.className = 'px-4 py-2 rounded bg-blue-600 text-white justify-self-start sm:col-span-2';
+  go.textContent = 'Generate';
+  form.append(go);
+  stepT.classList.add('hidden'); stepQ.classList.remove('hidden'); stepR.classList.add('hidden');
+}
+
+async function loadExample(ex) {
+  if (location.protocol === 'file:') {
+    alert('Examples cannot load from file://. Run "npx serve" in the project folder and open the printed localhost URL.');
+    return;
+  }
+  const res = await fetch(ex.url);
+  if (!res.ok) { alert('Could not load example'); return; }
+  let text = (await res.text()).replace(/\r\n/g, '\n');
+  const fm = text.match(/^---\n([\s\S]*?)\n---\n+/);
+  const form = $('form');
+  if (fm) {
+    text = text.slice(fm[0].length);
+    const apply = fm[1].match(/applyTo:\s*["']?([^"'\n]+)["']?/);
+    if (apply && form.elements.apply) form.elements.apply.value = apply[1].trim();
+  }
+  // The full document goes into the last field, so the other fields become optional.
+  for (const el of form.elements) if (el.name && el.name !== 'rules') el.required = false;
+  if (form.elements.name) form.elements.name.value = ex.name ?? '';
+  form.elements.rules.value = text.trim();
+}
+
+$('back').onclick = () => {
+  stepQ.classList.add('hidden'); stepR.classList.add('hidden'); stepT.classList.remove('hidden');
+};
+
+$('form').onsubmit = e => {
+  e.preventDefault();
+  const answers = Object.fromEntries(new FormData(e.target));
+  result = current.file(answers);
+  $('r-path').textContent = result.path;
+  $('r-where').textContent = current.where;
+  $('output').value = result.body;
+  stepR.classList.remove('hidden');
+  stepR.scrollIntoView({ behavior: 'smooth' });
+};
+
+$('copy').onclick = () => navigator.clipboard.writeText($('output').value);
+
+$('download').onclick = () => {
+  const url = URL.createObjectURL(new Blob([$('output').value], { type: 'text/markdown' }));
+  const a = document.createElement('a');
+  a.href = url; a.download = result.path.split('/').pop();
+  a.click();
+  URL.revokeObjectURL(url);
+};
+</script>
+</body>
+</html>
