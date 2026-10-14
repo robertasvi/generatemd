@@ -1,5 +1,5 @@
 ---
-applyTo: "**/model/*.java"
+applyTo: "**/exceptions/*.java"
 ---
 
 # Rule: Java Models, Entities & DTOs (Spring Boot)
