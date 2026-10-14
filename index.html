@@ -5,31 +5,40 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Agent Instructions Generator</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = { darkMode: 'class' };
+// Apply before first paint to avoid a light flash.
+document.documentElement.classList.toggle('dark',
+  (localStorage.getItem('theme') ?? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark');
+</script>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen">
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-screen">
 <main class="max-w-3xl mx-auto p-6">
-  <h1 class="text-2xl font-bold mb-1">Agent Instructions Generator</h1>
-  <p class="text-slate-600 mb-6">Pick a template, answer 3 questions, download the file.</p>
+  <div class="flex items-start justify-between">
+    <h1 class="text-2xl font-bold mb-1">Agent Instructions Generator</h1>
+    <button id="theme" class="px-3 py-1 text-sm rounded border border-slate-300 bg-white dark:bg-slate-800 dark:border-slate-600"></button>
+  </div>
+  <p class="text-slate-600 dark:text-slate-400 mb-6">Pick a template, answer 3 questions, download the file.</p>
 
   <section id="step-template" class="grid gap-3"></section>
 
   <section id="step-questions" class="hidden">
-    <button id="back" class="text-sm text-blue-600 mb-4">&larr; Change template</button>
+    <button id="back" class="text-sm text-blue-600 dark:text-blue-400 mb-4">&larr; Change template</button>
     <h2 id="q-title" class="text-xl font-semibold mb-1"></h2>
-    <p id="q-hint" class="text-sm text-slate-500 mb-4"></p>
+    <p id="q-hint" class="text-sm text-slate-500 dark:text-slate-400 mb-4"></p>
     <form id="form" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></form>
   </section>
 
   <section id="step-result" class="hidden mt-6">
     <div class="flex items-center justify-between mb-2">
-      <h2 class="font-semibold">Preview: <code id="r-path" class="bg-slate-200 px-1 rounded"></code></h2>
+      <h2 class="font-semibold">Preview: <code id="r-path" class="bg-slate-200 dark:bg-slate-700 px-1 rounded"></code></h2>
       <div class="flex gap-2">
-        <button id="copy" class="px-3 py-1 rounded border border-slate-300 bg-white">Copy</button>
+        <button id="copy" class="px-3 py-1 rounded border border-slate-300 bg-white dark:bg-slate-800 dark:border-slate-600">Copy</button>
         <button id="download" class="px-3 py-1 rounded bg-blue-600 text-white">Download</button>
       </div>
     </div>
-    <p id="r-where" class="text-sm text-slate-500 mb-2"></p>
-    <textarea id="output" rows="20" class="w-full font-mono text-sm p-3 border border-slate-300 rounded"></textarea>
+    <p id="r-where" class="text-sm text-slate-500 dark:text-slate-400 mb-2"></p>
+    <textarea id="output" rows="20" class="w-full font-mono text-sm p-3 border border-slate-300 rounded bg-white dark:bg-slate-800 dark:border-slate-600"></textarea>
   </section>
 </main>
 
@@ -45,20 +54,33 @@ const TEMPLATES = [
     name: 'AGENTS.md',
     desc: 'Project-wide instructions: stack, conventions, and rules for every AI agent request.',
     where: 'Place in the repository root (or .github/AGENTS.md).',
-    // Add agent files to /agents and list them here.
+    // One button fills every field from its own file.
     examples: [
-      { label: 'Financial reporting copilot', url: 'agents/agents.md' },
+      { label: 'Financial reporting copilot', files: {
+        project: 'agents/project-description.md',
+        stack: 'agents/tech-stack.md',
+        styling: 'agents/styling.md',
+        testing: 'agents/testing.md',
+        rules: 'agents/agents.md',
+      } },
     ],
     questions: [
-      { id: 'project', label: 'What is the project and what does it do?', type: 'textarea', ph: 'Internal invoicing web app for finance team' },
-      { id: 'stack', label: 'Tech stack, build and test commands (one per line)', type: 'textarea', ph: 'TypeScript, Angular 18\nBuild: npm run build\nTest: npm test' },
-      { id: 'rules', label: 'Conventions and things the agent must or must not do (one per line)', type: 'textarea', ph: 'Use standalone components\nNever commit secrets' },
+      { id: 'project', title: 'Project Description & Scope', label: 'Project description and scope', type: 'textarea', ph: 'Internal invoicing web app for finance team' },
+      { id: 'stack', title: 'Technology Stack', label: 'Technology stack', type: 'textarea', ph: 'TypeScript, Angular 18\nBuild: npm run build' },
+      { id: 'styling', title: 'Styling & Design', label: 'Styling and design', type: 'textarea', ph: 'Tailwind CSS, follow the company design system' },
+      { id: 'testing', title: 'Testing Standards', label: 'Testing standards', type: 'textarea', ph: 'Unit tests with Jest, e2e with Playwright' },
+      { id: 'rules', title: 'Rules & Workflow', label: 'Rules, architectural guidance and workflow checklist', type: 'textarea', ph: 'Use standalone components\nNever commit secrets' },
     ],
-    file: a => ({
-      path: 'AGENTS.md',
-      // Loaded examples are full markdown (start with a heading) and are kept verbatim.
-      body: /^#\s/.test(a.rules.trim()) ? `${a.rules.trim()}\n` : `# Agent Instructions\n\n## Project Overview\n${a.project.trim()}\n\n## Tech Stack & Commands\n${bullets(a.stack)}\n\n## Conventions & Rules\n${bullets(a.rules)}\n`,
-    }),
+    file: function (a) {
+      // Content that already starts with a heading is kept; otherwise a section heading is added.
+      const parts = this.questions.map(q => {
+        const text = (a[q.id] ?? '').trim();
+        if (!text) return '';
+        return text.startsWith('#') ? text : `## ${q.title}\n\n${text}`;
+      }).filter(Boolean);
+      if (!parts[0]?.startsWith('# ')) parts.unshift('# AGENTS.md');
+      return { path: 'AGENTS.md', body: parts.join('\n\n') + '\n' };
+    },
   },
   {
     id: 'skill',
@@ -100,15 +122,26 @@ const TEMPLATES = [
 ];
 
 const $ = id => document.getElementById(id);
+
+const themeBtn = document.getElementById('theme');
+const syncTheme = () => {
+  themeBtn.textContent = document.documentElement.classList.contains('dark') ? 'Light mode' : 'Dark mode';
+};
+themeBtn.onclick = () => {
+  const dark = document.documentElement.classList.toggle('dark');
+  localStorage.setItem('theme', dark ? 'dark' : 'light');
+  syncTheme();
+};
+syncTheme();
 const stepT = $('step-template'), stepQ = $('step-questions'), stepR = $('step-result');
 let current = null, result = null;
 
-const field = 'w-full border border-slate-300 rounded p-2 bg-white';
+const field = 'w-full border border-slate-300 rounded p-2 bg-white dark:bg-slate-800 dark:border-slate-600';
 
 TEMPLATES.forEach(t => {
   const b = document.createElement('button');
-  b.className = 'text-left p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-500';
-  b.innerHTML = `<div class="font-semibold"></div><div class="text-sm text-slate-600"></div>`;
+  b.className = 'text-left p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-blue-500';
+  b.innerHTML = `<div class="font-semibold"></div><div class="text-sm text-slate-600 dark:text-slate-400"></div>`;
   b.children[0].textContent = t.name;
   b.children[1].textContent = t.desc;
   b.onclick = () => select(t);
@@ -124,11 +157,11 @@ function select(t) {
   if (t.examples) {
     const bar = document.createElement('div');
     bar.className = 'flex flex-wrap items-center gap-2 sm:col-span-2';
-    bar.innerHTML = '<span class="text-sm text-slate-600">Start from an example:</span>';
+    bar.innerHTML = '<span class="text-sm text-slate-600 dark:text-slate-400">Start from an example:</span>';
     t.examples.forEach(ex => {
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = 'px-3 py-1 text-sm rounded border border-slate-300 bg-white hover:border-blue-500';
+      b.className = 'px-3 py-1 text-sm rounded border border-slate-300 bg-white dark:bg-slate-800 dark:border-slate-600 hover:border-blue-500';
       b.textContent = ex.label;
       b.onclick = () => loadExample(ex);
       bar.append(b);
@@ -159,20 +192,22 @@ async function loadExample(ex) {
     alert('Examples cannot load from file://. Run "npx serve" in the project folder and open the printed localhost URL.');
     return;
   }
-  const res = await fetch(ex.url);
-  if (!res.ok) { alert('Could not load example'); return; }
-  let text = (await res.text()).replace(/\r\n/g, '\n');
-  const fm = text.match(/^---\n([\s\S]*?)\n---\n+/);
   const form = $('form');
-  if (fm) {
-    text = text.slice(fm[0].length);
-    const apply = fm[1].match(/applyTo:\s*["']?([^"'\n]+)["']?/);
-    if (apply && form.elements.apply) form.elements.apply.value = apply[1].trim();
+  // Single-file examples (rules) go into the 'rules' field.
+  const files = ex.files ?? { rules: ex.url };
+  for (const [field, url] of Object.entries(files)) {
+    const res = await fetch(url);
+    if (!res.ok) { alert(`Could not load ${url}`); return; }
+    let text = (await res.text()).replace(/\r\n/g, '\n');
+    const fm = text.match(/^---\n([\s\S]*?)\n---\n+/);
+    if (fm) {
+      text = text.slice(fm[0].length);
+      const apply = fm[1].match(/applyTo:\s*["']?([^"'\n]+)["']?/);
+      if (apply && form.elements.apply) form.elements.apply.value = apply[1].trim();
+    }
+    form.elements[field].value = text.trim();
   }
-  // The full document goes into the last field, so the other fields become optional.
-  for (const el of form.elements) if (el.name && el.name !== 'rules') el.required = false;
-  if (form.elements.name) form.elements.name.value = ex.name ?? '';
-  form.elements.rules.value = text.trim();
+  if (form.elements.name && ex.name) form.elements.name.value = ex.name;
 }
 
 $('back').onclick = () => {
