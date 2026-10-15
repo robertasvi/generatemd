@@ -28,23 +28,24 @@ You are an expert autonomous software engineering agent. Your goal is to refacto
 The legacy application uses raw SQL queries via `pg-promise` inside a monolithic service layer. We are migrating the user management module to Prisma ORM.
 
 ### Relevant Schema Snippet
-```prisma
+` ```prisma
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
   posts     Post[]
 }
-```
-```md
+``` `
 </context>
 
 <input_data>
 Here is the legacy raw SQL query you need to migrate:
 
+` ```prisma
 SELECT users.id, users.email, count(posts.id) as post_count 
 FROM users 
 LEFT JOIN posts ON users.id = posts.user_id 
 GROUP BY users.id;
+``` `
 </input_data>
 
 <output_format>
@@ -55,6 +56,7 @@ Provide your response using the following structure:
 **Verification:** Steps to test the new implementation.
 </output_format>
 ```
+
 
 ### Key Patterns for Best Results
 
