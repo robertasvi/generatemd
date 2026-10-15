@@ -30,6 +30,7 @@ document.documentElement.classList.toggle('dark',
 </style>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-screen">
 <main class="max-w-3xl mx-auto p-6">
@@ -155,16 +156,24 @@ const TEMPLATES = [
     id: 'skill',
     name: 'SKILL.md',
     desc: 'A reusable skill: a specific task the agent can perform with a defined workflow.',
-    where: 'Place in .github/skills/<skill-name>/SKILL.md.',
-    questions: [
-      { id: 'name', label: 'Skill name', type: 'text', ph: 'Create release notes' },
-      { id: 'when', label: 'When should the agent use this skill?', type: 'textarea', ph: 'When the user asks to prepare release notes or a changelog' },
-      { id: 'steps', label: 'Steps the agent should follow (one per line)', type: 'textarea', ph: 'Read merged PRs since last tag\nGroup by feature/fix\nWrite CHANGELOG entry' },
+    where: 'Choose .github/skills as the destination to create a ready-to-use skill folder.',
+    examples: [
+      { name: 'Code verification', label: 'Code verification', files: { content: 'skills/code-verification.md' } },
     ],
-    file: a => ({
-      path: `skills/${slug(a.name)}/SKILL.md`,
-      body: `---\nname: ${slug(a.name)}\ndescription: ${a.when.trim().replace(/\s*\n\s*/g, ' ')}\n---\n\n# ${a.name.trim()}\n\n## When to use\n${a.when.trim()}\n\n## Steps\n${lines(a.steps).map((l, i) => `${i + 1}. ${l}`).join('\n')}\n`,
-    }),
+    questions: [
+      { id: 'name', label: 'Skill name', type: 'text', ph: 'Code verification' },
+      { id: 'description', label: 'When should the agent use this skill?', type: 'textarea', ph: 'When the user asks to review code or verify a change' },
+      { id: 'content', label: 'Skill instructions (Markdown)', type: 'textarea', ph: '# Workflow\n\nDescribe the steps the agent should follow.' },
+    ],
+    file: a => {
+      const folder = slug(a.name);
+      const description = a.description.trim().replace(/\s*\n\s*/g, ' ');
+      return {
+        path: `${folder}/SKILL.md`,
+        folder,
+        body: `---\nname: ${folder}\ndescription: ${description}\n---\n\n${a.content.trim()}\n`,
+      };
+    },
   },
   {
     id: 'rule',
@@ -324,6 +333,22 @@ function saveFile(name, body) {
   URL.revokeObjectURL(url);
 }
 
+async function saveFolderZip(folderName, fileName, body) {
+  try {
+    const zip = new JSZip();
+    zip.folder(folderName).file(fileName, body);
+    const blob = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${folderName}.zip`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch {
+    alert('Could not create the skill ZIP. Check your connection and try again.');
+  }
+}
+
 async function loadExample(ex) {
   if (location.protocol === 'file:') {
     alert('Examples cannot load from file://. Run "npx serve" in the project folder and open the printed localhost URL.');
@@ -338,6 +363,8 @@ async function loadExample(ex) {
     let text = (await res.text()).replace(/\r\n/g, '\n');
     const fm = text.match(/^---\n([\s\S]*?)\n---\n+/);
     if (fm) {
+      const description = fm[1].match(/^description:\s*(.+)$/m);
+      if (description && form.elements.description) form.elements.description.value = description[1].trim();
       text = text.slice(fm[0].length);
       const apply = fm[1].match(/applyTo:\s*["']?([^"'\n]+)["']?/);
       if (apply && form.elements.apply) form.elements.apply.value = apply[1].trim();
@@ -407,13 +434,16 @@ $('form').onsubmit = e => {
   $('r-path').textContent = result.path;
   $('r-where').textContent = current.where;
   $('output').value = result.body;
+  $('download').textContent = 'Download';
   stepR.classList.remove('hidden');
   stepR.scrollIntoView({ behavior: 'smooth' });
 };
 
 $('copy').onclick = () => navigator.clipboard.writeText($('output').value);
 
-$('download').onclick = () => saveFile(result.path, $('output').value);
+$('download').onclick = () => result.folder
+  ? saveFolderZip(result.folder, 'SKILL.md', $('output').value)
+  : saveFile(result.path, $('output').value);
 </script>
 </body>
 </html>
