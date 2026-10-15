@@ -36,6 +36,8 @@ model User {
 }
 ```
 ```md
+</context>
+
 <input_data>
 
 Here is the legacy raw SQL query you need to migrate:
