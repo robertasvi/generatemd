@@ -1,5 +1,7 @@
 Combining XML tags with Markdown is one of the most effective ways to engineer prompts for advanced AI agents (like Claude 3.5 Sonnet, GPT-4o, or custom agent frameworks).
 
+XML-like document is mentioned in Antropic, OpenAI and Google documents as more efficient way for complex prompts.
+
 While Markdown provides clean visual hierarchy for humans and general parsing for models, XML tags act as strict programmatic boundaries. They explicitly tell the model where specific sections (like context, data, tools, or instructions) begin and end, virtually eliminating context bleeding.
 
 ### Why the Hybrid Approach Works
