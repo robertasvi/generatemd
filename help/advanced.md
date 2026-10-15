@@ -35,6 +35,7 @@ model User {
   posts     Post[]
 }
 ```
+```md
 <input_data>
 Here is the legacy raw SQL query you need to migrate:
 
@@ -46,11 +47,12 @@ GROUP BY users.id;
 
 <output_format>
 Provide your response using the following structure:
-Analysis: Brief explanation of how the SQL translates to Prisma.
-Refactored Code: The Prisma implementation inside a fenced code block.
-Verification: Steps to test the new implementation.
-</output_format>
 
+**Analysis:** Brief explanation of how the SQL translates to Prisma.
+**Refactored Code:** The Prisma implementation inside a fenced code block.
+**Verification:** Steps to test the new implementation.
+</output_format>
+```
 
 ### Key Patterns for Best Results
 
