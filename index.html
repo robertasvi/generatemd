@@ -177,7 +177,7 @@ const TEMPLATES = [
   },
   {
     id: 'rule',
-    name: '/rules/[name].instructions.md',
+    name: '/instructions/[name].instructions.md',
     desc: 'Scoped rules applied automatically to files matching a glob pattern.',
     where: 'Place in .github/instructions/ (or your rules folder).',
     // Add rule files to /rules and list them here.
@@ -187,7 +187,7 @@ const TEMPLATES = [
       { name: 'spring-security-jwt', label: 'Spring Security JWT', url: 'rules/spring-security-jwt.md' },
     ],
     questions: [
-      { id: 'name', label: 'Rule name', type: 'text', ph: 'angular-components' },
+      { id: 'name', label: 'Instruction name', type: 'text', ph: 'angular-components' },
       { id: 'apply', label: 'Which files does it apply to? (glob)', type: 'text', ph: '**/*.component.ts' },
       { id: 'rules', label: 'Rules to follow (one per line)', type: 'textarea', ph: 'Use signals for state\nKeep templates under 100 lines' },
     ],
