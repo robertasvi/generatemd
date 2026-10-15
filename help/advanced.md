@@ -35,3 +35,26 @@ model User {
   posts     Post[]
 }
 ```
+<input_data>
+Here is the legacy raw SQL query you need to migrate:
+
+SELECT users.id, users.email, count(posts.id) as post_count 
+FROM users 
+LEFT JOIN posts ON users.id = posts.user_id 
+GROUP BY users.id;
+</input_data>
+
+<output_format>
+Provide your response using the following structure:
+Analysis: Brief explanation of how the SQL translates to Prisma.
+Refactored Code: The Prisma implementation inside a fenced code block.
+Verification: Steps to test the new implementation.
+</output_format>
+
+
+### Key Patterns for Best Results
+
+1. **Keep the Outer Shell in Markdown:** Use standard Markdown headers (`#`, `##`) for the top-level sections so human engineers can quickly scan the prompt template.
+2. **Wrap Variable Data and Context in XML:** Whenever you inject dynamic variables, user code, logs, or reference documentation into a prompt, wrap them in semantic tags like `<context>`, `<input_data>`, or `<examples>`. This prevents a malicious or malformed input from "jailbreaking" or overriding your system instructions.
+3. **Use Explicit Closing Tags:** Always close your XML tags (`</instructions>`, `</context>`). Unclosed tags can confuse the model's parser and alter how it handles the rest of the token stream.
+4. **Leverage Nested Structures:** You can nest Markdown inside XML (or vice versa) safely, as shown in the `<context>` block above where a Markdown header and code block live inside the XML tag.
