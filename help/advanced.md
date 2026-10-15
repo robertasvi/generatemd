@@ -37,6 +37,7 @@ model User {
 ```
 ```md
 <input_data>
+
 Here is the legacy raw SQL query you need to migrate:
 
 SELECT users.id, users.email, count(posts.id) as post_count 
