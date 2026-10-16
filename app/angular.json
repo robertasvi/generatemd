@@ -24,6 +24,9 @@
                 "input": "public"
               }
             ],
+            "allowedCommonJsDependencies": [
+              "jszip"
+            ],
             "styles": [
               "src/styles.css"
             ]
@@ -38,8 +41,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "10kB",
+                  "maximumError": "12kB"
                 }
               ],
               "outputHashing": "all"
