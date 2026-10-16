@@ -57,6 +57,7 @@ h2 { margin-bottom: 5px; font-size: 1.3rem; line-height: 1.3; font-weight: 680; 
 .template-name { font-weight: 700; }
 .template-description, .destination { color: var(--muted); font-size: .88rem; line-height: 1.5; }
 .template-name, .template-description { overflow-wrap: anywhere; }
+.beta-label { flex: 0 0 auto; padding: 4px 7px; border: 1px solid var(--accent); border-radius: 4px; color: var(--accent-strong); font-size: .7rem; font-weight: 700; }
 .template-arrow { margin-left: auto; color: var(--accent); font-size: 1.2rem; }
 .why-section { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, .85fr); gap: 35px; margin-top: 40px; padding: 24px 0 20px; border-top: 1px solid var(--line); }
 .why-intro h2 { max-width: 370px; font-size: 1.15rem; }

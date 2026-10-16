@@ -47,6 +47,21 @@ describe('generator', () => {
       '---\napplyTo: "**/*.ts"\n---\n\n# exceptions\n\n- Preserve error context\n- Add tests\n',
     );
   });
+
+  it('generates a task instruction with all specification sections', () => {
+    const file = generateFile('task', {
+      description: 'Add a close action.',
+      files: 'app/src/app/app.html\napp/src/app/app.ts',
+      acceptance: 'Close returns to the main view.',
+      tests: 'Verify close from form and preview.',
+      steps: 'Add the button\nReset state',
+    });
+
+    expect(file.path).toBe('task-instructions.md');
+    expect(file.body).toBe(
+      '# Task Instructions\n\n## Description\n\nAdd a close action.\n\n## Files in scope\n\napp/src/app/app.html\napp/src/app/app.ts\n\n## Acceptance criteria\n\nClose returns to the main view.\n\n## Acceptance test criteria\n\nVerify close from form and preview.\n\n## Steps\n\nAdd the button\nReset state\n',
+    );
+  });
 });
 
 describe('App', () => {
@@ -90,6 +105,26 @@ describe('App', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('#template-heading')?.textContent).toContain('Choose a file');
     expect(fixture.nativeElement.querySelector('.work-stage')).toBeNull();
+  });
+
+  it('shows the beta task generator with its five specification fields', () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelectorAll('.template-option').length).toBe(4);
+    expect(fixture.nativeElement.querySelector('.beta-label')?.textContent).toContain('Beta');
+    (fixture.nativeElement.querySelector('.template-option:last-child') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    const labels = [...fixture.nativeElement.querySelectorAll('.question-field > span')]
+      .map((label: HTMLSpanElement) => label.textContent);
+    expect(labels).toEqual([
+      'Description',
+      'Files in scope',
+      'Acceptance criteria',
+      'Acceptance test criteria',
+      'Steps',
+    ]);
   });
 });
 

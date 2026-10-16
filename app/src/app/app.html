@@ -20,16 +20,17 @@
           <p class="eyebrow">START HERE</p>
           <h2 id="template-heading">Choose a file to create</h2>
         </div>
-        <span class="step-count">3 templates</span>
+        <span class="step-count">{{ templates.length }} templates</span>
       </div>
       <div class="template-list">
         @for (template of templates; track template.id) {
           <button class="template-option" type="button" (click)="selectTemplate(template)">
-            <span class="template-mark" aria-hidden="true">{{ template.id === 'agents' ? 'A' : template.id === 'skill' ? 'S' : 'R' }}</span>
+            <span class="template-mark" aria-hidden="true">{{ template.id === 'agents' ? 'A' : template.id === 'skill' ? 'S' : template.id === 'task' ? 'T' : 'R' }}</span>
             <span class="template-copy">
               <span class="template-name">{{ template.name }}</span>
               <span class="template-description">{{ template.description }}</span>
             </span>
+            @if (template.isBeta) { <span class="beta-label">Beta</span> }
             <span class="template-arrow" aria-hidden="true">↗</span>
           </button>
         }

@@ -1,4 +1,4 @@
-export type TemplateId = 'agents' | 'skill' | 'rule';
+export type TemplateId = 'agents' | 'skill' | 'rule' | 'task';
 export type QuestionType = 'text' | 'textarea';
 
 export interface GeneratorQuestion {
@@ -27,6 +27,7 @@ export interface GeneratorTemplate {
   description: string;
   destination: string;
   wizard?: boolean;
+  isBeta?: boolean;
   examples: TemplateExample[];
   questions: GeneratorQuestion[];
   generate(answers: Record<string, string>): GeneratedFile;
@@ -119,6 +120,31 @@ export const TEMPLATES: GeneratorTemplate[] = [
       path: `${slug(answers['name'] ?? '')}.instructions.md`,
       body: `---\napplyTo: "${(answers['apply'] ?? '').trim().replace(/"/g, '\\"')}"\n---\n\n${/^#\s/.test((answers['rules'] ?? '').trim()) ? (answers['rules'] ?? '').trim() : `# ${(answers['name'] ?? '').trim()}\n\n${bullets(answers['rules'] ?? '')}`}\n`,
     }),
+  },
+  {
+    id: 'task',
+    name: 'Task Instruction Generator',
+    description: 'Turn a feature request into a clear task specification for an AI coding agent.',
+    destination: 'Save as task-instructions.md in the repository or feature workspace.',
+    isBeta: true,
+    examples: [],
+    questions: [
+      { id: 'description', label: 'Description', type: 'textarea', placeholder: 'Describe the feature, user need, and important context.' },
+      { id: 'files', label: 'Files in scope', type: 'textarea', placeholder: 'List files or directories the implementation should touch.' },
+      { id: 'acceptance', label: 'Acceptance criteria', type: 'textarea', placeholder: 'Describe observable behavior that defines completion.' },
+      { id: 'tests', label: 'Acceptance test criteria', type: 'textarea', placeholder: 'List the tests or verification required to accept the change.' },
+      { id: 'steps', label: 'Steps', type: 'textarea', placeholder: 'Outline the implementation sequence.' },
+    ],
+    generate: answers => {
+      const sections = [
+        ['Description', 'description'],
+        ['Files in scope', 'files'],
+        ['Acceptance criteria', 'acceptance'],
+        ['Acceptance test criteria', 'tests'],
+        ['Steps', 'steps'],
+      ].map(([title, id]) => `## ${title}\n\n${(answers[id] ?? '').trim()}`);
+      return { path: 'task-instructions.md', body: `# Task Instructions\n\n${sections.join('\n\n')}\n` };
+    },
   },
 ];
 
