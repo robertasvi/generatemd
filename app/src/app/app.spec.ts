@@ -73,6 +73,23 @@ describe('App', () => {
     fixture.detectChanges();
     expect((fixture.nativeElement.querySelector('.preview-field textarea') as HTMLTextAreaElement).value)
       .toBe('# AGENTS.md\n');
+
+    (fixture.nativeElement.querySelector('.stage-navigation .close-button') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#template-heading')?.textContent).toContain('Choose a file');
+    expect(fixture.nativeElement.querySelector('.result-stage')).toBeNull();
+  });
+
+  it('closes the question form back to template selection', () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+    (fixture.nativeElement.querySelector('.template-option') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    (fixture.nativeElement.querySelector('.stage-navigation .close-button') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#template-heading')?.textContent).toContain('Choose a file');
+    expect(fixture.nativeElement.querySelector('.work-stage')).toBeNull();
   });
 });
 

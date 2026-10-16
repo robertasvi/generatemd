@@ -52,7 +52,10 @@
 
   @if (stage() === 'questions' && selectedTemplate(); as template) {
     <section class="work-stage" aria-labelledby="question-heading">
-      <button class="back-link" type="button" (click)="chooseAnotherTemplate()">← All templates</button>
+      <div class="stage-navigation">
+        <button class="back-link" type="button" (click)="chooseAnotherTemplate()">← All templates</button>
+        <button class="close-button" type="button" (click)="closeWorkflow()">× Close</button>
+      </div>
       <div class="section-heading form-heading">
         <div>
           <p class="eyebrow">{{ template.wizard ? 'PROJECT PROFILE' : 'NEW FILE' }}</p>
@@ -116,7 +119,10 @@
 
   @if (stage() === 'result' && result(); as file) {
     <section class="result-stage" aria-labelledby="result-heading">
-      <button class="back-link" type="button" (click)="editAnswers()">← Edit answers</button>
+      <div class="stage-navigation">
+        <button class="back-link" type="button" (click)="editAnswers()">← Edit answers</button>
+        <button class="close-button" type="button" (click)="closeWorkflow()">× Close</button>
+      </div>
       <div class="result-heading">
         <div>
           <p class="eyebrow">READY TO SAVE</p>

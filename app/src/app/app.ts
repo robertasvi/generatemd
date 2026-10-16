@@ -119,6 +119,17 @@ export class App {
     this.stage.set('templates');
   }
 
+  protected closeWorkflow(): void {
+    this.selectedId.set(null);
+    this.answers.set({});
+    this.currentStep.set(0);
+    this.result.set(null);
+    this.output.set('');
+    this.exampleMessage.set('');
+    this.notice.set('');
+    this.stage.set('templates');
+  }
+
   protected async copyOutput(): Promise<void> {
     try {
       await navigator.clipboard.writeText(this.output());
