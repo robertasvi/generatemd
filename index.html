@@ -128,11 +128,11 @@ const TEMPLATES = [
     // One button fills every field from its own file.
     examples: [
       { label: 'Financial reporting app', files: {
-        project: 'agents/project-description.md',
-        stack: 'agents/tech-stack.md',
-        styling: 'agents/design-principles.md',
-        testing: 'agents/testing.md',
-        rules: 'agents/agents.md',
+        project: 'app/public/agents/project-description.md',
+        stack: 'app/public/agents/tech-stack.md',
+        styling: 'app/public/agents/design-principles.md',
+        testing: 'app/public/agents/testing.md',
+        rules: 'app/public/agents/agents.md',
       } },
     ],
     questions: [
@@ -161,7 +161,7 @@ const TEMPLATES = [
     desc: 'A reusable skill: a specific task the agent can perform with a defined workflow.',
     where: 'Choose .github/skills as the destination to create a ready-to-use skill folder.',
     examples: [
-      { name: 'Code verification', label: 'Code verification', files: { content: 'skills/code-verification.md' } },
+      { name: 'Code verification', label: 'Code verification', files: { content: 'app/public/skills/code-verification.md' } },
     ],
     questions: [
       { id: 'name', label: 'Skill name', type: 'text', ph: 'Code verification' },
@@ -185,9 +185,9 @@ const TEMPLATES = [
     where: 'Place in .github/instructions/ (or your rules folder).',
     // Add rule files to /rules and list them here.
     examples: [
-      { name: 'typescript-models', label: 'TypeScript models', url: 'rules/typescript-models.md' },
-      { name: 'exceptions', label: 'Exceptions', url: 'rules/exceptions.md' },
-      { name: 'spring-security-jwt', label: 'Spring Security JWT', url: 'rules/spring-security-jwt.md' },
+      { name: 'typescript-models', label: 'TypeScript models', url: 'app/public/rules/typescript-models.md' },
+      { name: 'exceptions', label: 'Exceptions', url: 'app/public/rules/exceptions.md' },
+      { name: 'spring-security-jwt', label: 'Spring Security JWT', url: 'app/public/rules/spring-security-jwt.md' },
     ],
     questions: [
       { id: 'name', label: 'Instruction name', type: 'text', ph: 'angular-components' },
@@ -384,11 +384,11 @@ async function loadExample(ex) {
 
 // Add help pages here; each becomes a tab.
 const HELP_PAGES = [
-  { title: 'What to highlight', url: 'help/content.md' },
-  { title: 'Syntax tree (AST)', url: 'help/syntax-tree.md' },
-  { title: 'Ordering', url: 'help/ordering.md' },
-  { title: 'How agents work', url: 'help/agent.md' },
-  { title: 'High efficiency prompts', url: 'help/advanced.md' },
+  { title: 'What to highlight', url: 'app/public/help/content.md' },
+  { title: 'Syntax tree (AST)', url: 'app/public/help/syntax-tree.md' },
+  { title: 'Ordering', url: 'app/public/help/ordering.md' },
+  { title: 'How agents work', url: 'app/public/help/agent.md' },
+  { title: 'High efficiency prompts', url: 'app/public/help/advanced.md' },
 ];
 const helpCache = {};
 let helpIdx = 0;
