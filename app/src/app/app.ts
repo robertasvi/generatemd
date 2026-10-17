@@ -150,6 +150,13 @@ export class App {
     }
   }
 
+  protected downloadJson(): void {
+    const result = this.result();
+    if (!result) return;
+    this.downloadService.downloadJson(result, this.output());
+    this.notice.set('Download started.');
+  }
+
   protected toggleTheme(): void {
     const dark = !this.isDark();
     this.isDark.set(dark);

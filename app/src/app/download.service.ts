@@ -16,6 +16,12 @@ export class DownloadService {
     this.save(new Blob([body], { type: 'text/markdown' }), file.path.split('/').pop() ?? file.path);
   }
 
+  downloadJson(file: GeneratedFile, body: string): void {
+    const name = (file.folder ?? file.path.split('/').pop() ?? file.path).replace(/\.md$/, '');
+    const json = JSON.stringify({ path: file.path, folder: file.folder, content: body.split(/\r?\n/) }, null, 2);
+    this.save(new Blob([json], { type: 'application/json' }), `${name}.json`);
+  }
+
   private save(blob: Blob, filename: string): void {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');

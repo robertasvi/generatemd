@@ -133,6 +133,7 @@
         <div class="result-actions">
           <button class="quiet-button" type="button" (click)="copyOutput()">Copy</button>
           <button class="primary-button" type="button" (click)="downloadOutput()">{{ file.folder ? 'Download ZIP' : 'Download .md' }}</button>
+          <button class="primary-button" type="button" (click)="downloadJson()">Download .json</button>
         </div>
       </div>
       @if (notice()) { <p class="status-message action-status" aria-live="polite">{{ notice() }}</p> }
