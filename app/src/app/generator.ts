@@ -127,23 +127,37 @@ export const TEMPLATES: GeneratorTemplate[] = [
     description: 'Turn a feature request into a clear task specification for an AI coding agent.',
     destination: 'Save as task-instructions.md in the repository or feature workspace.',
     isBeta: true,
-    examples: [],
+    examples: [
+      {
+        name: 'Feature: User Profile Picture Upload',
+        label: 'Profile picture upload',
+        files: {
+          overview: 'tasks/overview.md',
+          scope: 'tasks/scope.md',
+          criteria: 'tasks/criteria.md',
+          tests: 'tasks/tests.md',
+          references: 'tasks/references.md',
+        },
+      },
+    ],
     questions: [
-      { id: 'description', label: 'Description', type: 'textarea', placeholder: 'Describe the feature, user need, and important context.' },
-      { id: 'files', label: 'Files in scope', type: 'textarea', placeholder: 'List files or directories the implementation should touch.' },
-      { id: 'acceptance', label: 'Acceptance criteria', type: 'textarea', placeholder: 'Describe observable behavior that defines completion.' },
-      { id: 'tests', label: 'Acceptance test criteria', type: 'textarea', placeholder: 'List the tests or verification required to accept the change.' },
-      { id: 'steps', label: 'Steps', type: 'textarea', placeholder: 'Outline the implementation sequence.' },
+      { id: 'name', label: 'Feature title', type: 'text', placeholder: 'Feature: User Profile Picture Upload' },
+      { id: 'overview', label: 'Overview & Goal', type: 'textarea', placeholder: 'Briefly explain what is being built and why.' },
+      { id: 'scope', label: 'Technical Scope & Files', type: 'textarea', placeholder: '* **Target Files:** `src/components/UserProfile.tsx`\n* **Dependencies to Use:** ...\n* **Do NOT:** ...' },
+      { id: 'criteria', label: 'Acceptance Criteria (The Rules)', type: 'textarea', placeholder: '* AC1: Users can upload PNG or JPEG images under 5MB.' },
+      { id: 'tests', label: 'Acceptance Tests (The Verification)', type: 'textarea', placeholder: '* Test 1: Upload a valid 2MB PNG -> Verify success state.' },
+      { id: 'references', label: 'References / Related Skills', type: 'textarea', placeholder: '* Follow the patterns defined in `.github/skills/error-handling/SKILL.md`.' },
     ],
     generate: answers => {
       const sections = [
-        ['Description', 'description'],
-        ['Files in scope', 'files'],
-        ['Acceptance criteria', 'acceptance'],
-        ['Acceptance test criteria', 'tests'],
-        ['Steps', 'steps'],
+        ['1. Overview & Goal', 'overview'],
+        ['2. Technical Scope & Files', 'scope'],
+        ['3. Acceptance Criteria (The Rules)', 'criteria'],
+        ['4. Acceptance Tests (The Verification)', 'tests'],
+        ['5. References / Related Skills', 'references'],
       ].map(([title, id]) => `## ${title}\n\n${(answers[id] ?? '').trim()}`);
-      return { path: 'task-instructions.md', body: `# Task Instructions\n\n${sections.join('\n\n')}\n` };
+      const title = (answers['name'] ?? '').trim() || 'Task Instructions';
+      return { path: 'task-instructions.md', body: `# ${title}\n\n${sections.join('\n\n')}\n` };
     },
   },
 ];

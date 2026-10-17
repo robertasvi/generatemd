@@ -50,16 +50,16 @@ describe('generator', () => {
 
   it('generates a task instruction with all specification sections', () => {
     const file = generateFile('task', {
-      description: 'Add a close action.',
-      files: 'app/src/app/app.html\napp/src/app/app.ts',
-      acceptance: 'Close returns to the main view.',
+      overview: 'Add a close action.',
+      scope: 'app/src/app/app.html\napp/src/app/app.ts',
+      criteria: 'Close returns to the main view.',
       tests: 'Verify close from form and preview.',
-      steps: 'Add the button\nReset state',
+      references: 'Reset state',
     });
 
     expect(file.path).toBe('task-instructions.md');
     expect(file.body).toBe(
-      '# Task Instructions\n\n## Description\n\nAdd a close action.\n\n## Files in scope\n\napp/src/app/app.html\napp/src/app/app.ts\n\n## Acceptance criteria\n\nClose returns to the main view.\n\n## Acceptance test criteria\n\nVerify close from form and preview.\n\n## Steps\n\nAdd the button\nReset state\n',
+      '# Task Instructions\n\n## 1. Overview & Goal\n\nAdd a close action.\n\n## 2. Technical Scope & Files\n\napp/src/app/app.html\napp/src/app/app.ts\n\n## 3. Acceptance Criteria (The Rules)\n\nClose returns to the main view.\n\n## 4. Acceptance Tests (The Verification)\n\nVerify close from form and preview.\n\n## 5. References / Related Skills\n\nReset state\n',
     );
   });
 });
@@ -107,7 +107,7 @@ describe('App', () => {
     expect(fixture.nativeElement.querySelector('.work-stage')).toBeNull();
   });
 
-  it('shows the beta task generator with its five specification fields', () => {
+  it('shows the beta task generator with its specification fields', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
 
@@ -119,11 +119,12 @@ describe('App', () => {
     const labels = [...fixture.nativeElement.querySelectorAll('.question-field > span')]
       .map((label: HTMLSpanElement) => label.textContent);
     expect(labels).toEqual([
-      'Description',
-      'Files in scope',
-      'Acceptance criteria',
-      'Acceptance test criteria',
-      'Steps',
+      'Feature title',
+      'Overview & Goal',
+      'Technical Scope & Files',
+      'Acceptance Criteria (The Rules)',
+      'Acceptance Tests (The Verification)',
+      'References / Related Skills',
     ]);
   });
 });
