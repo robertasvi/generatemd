@@ -93,7 +93,7 @@
               <label class="question-field" [class.question-wide]="template.wizard || index >= 2">
                 <span>{{ question.title ?? question.label }}</span>
                 @if (question.type === 'textarea') {
-                  <textarea [name]="question.id" [placeholder]="question.placeholder" [rows]="template.wizard || index === template.questions.length - 1 ? 16 : 4" [required]="!template.wizard" [ngModel]="answers()[question.id] ?? ''" [ngModelOptions]="{ standalone: true }" (ngModelChange)="setAnswer(question.id, $event)"></textarea>
+                  <textarea [name]="question.id" [placeholder]="question.placeholder" [rows]="template.wizard || (template.id !== 'task' && index === template.questions.length - 1) ? 16 : 4" [required]="!template.wizard" [ngModel]="answers()[question.id] ?? ''" [ngModelOptions]="{ standalone: true }" (ngModelChange)="setAnswer(question.id, $event)"></textarea>
                 } @else {
                   <input [name]="question.id" [type]="question.type" [placeholder]="question.placeholder" [required]="!template.wizard" [ngModel]="answers()[question.id] ?? ''" [ngModelOptions]="{ standalone: true }" (ngModelChange)="setAnswer(question.id, $event)">
                 }
