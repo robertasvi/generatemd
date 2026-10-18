@@ -2,14 +2,12 @@
 applyTo: "**/exceptions/*.java"
 ---
 
-Rule: Java Models, Entities & DTOs (Spring Boot)
+# Rule: Java Models, Entities & DTOs (Spring Boot)
 
----
-
-Context
+## Context
 Applies to all domain models, JPA/Hibernate entities, DTOs (Data Transfer Objects), and records in the Spring Boot backend architecture.
 
-Principles
+## Principles
 
 1. Use Java Records for DTOs and Immutable Data
     Use `public record` for data transfer objects (DTOs), API requests/responses, and immutable payloads. Records provide concise syntax, built-in constructors, `equals()`, `hashCode()`, and `toString()` methods automatically.
@@ -36,9 +34,9 @@ Principles
 
 ---
 
-Code Examples
+## Code Examples
 
-Good Example: Immutable DTO Record with Validation
+### Good Example: Immutable DTO Record with Validation
 
 ```java
 package com.example.project.user.dto;
@@ -58,7 +56,7 @@ public record CreateUserRequest(
 ) {}
 ```
 
-Good Example: JPA Entity (Safe Lombok & Lazy Loading)
+### Good Example: JPA Entity (Safe Lombok & Lazy Loading)
 
 ```java
 package com.example.project.user.entity;
@@ -105,7 +103,7 @@ public class UserEntity {
 }
 ```
 
-Bad Example
+### Bad Example
 
 ```java
 // DON'T: Using @Data on JPA entities and missing validations
