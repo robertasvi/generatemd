@@ -1,4 +1,4 @@
-When creating or modifying features, the agent must write corresponding **Playwright** tests following these conventions based on TDD.
+When creating or modifying features, the agent must write corresponding Playwright tests following these conventions based on TDD.
 
 ```typescript
 // Example test expectation structure for agent-generated tests
@@ -21,6 +21,10 @@ test.describe('Financial Self-Service Report Generation', () => {
 });
 ```
 
-- Flakiness Prevention: Use Playwright auto-waiting assertions (toBeVisible(), toHaveURL()) rather than arbitrary page.waitForTimeout().
+Flakiness Prevention 
 
-- Accessibility Tests: Include basic axe-playwright checks on report tables to guarantee accessible colors, screen-reader table headers, and keyboard navigation.
+Use Playwright auto-waiting assertions (toBeVisible(), toHaveURL()) rather than arbitrary page.waitForTimeout().
+
+Accessibility Tests
+
+Include basic axe-playwright checks on report tables to guarantee accessible colors, screen-reader table headers, and keyboard navigation.

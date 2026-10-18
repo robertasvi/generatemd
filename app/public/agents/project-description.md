@@ -1,1 +1,1 @@
-This repository houses the customer-facing **Self-Service Financial Reporting Application**. It enables authorized users with active **Two-Step Verification (2FA)** to query, generate, and view detailed financial reports and automated insights without requiring assistance from client support.
+This repository houses the customer-facing self-service financial reporting application**. It enables authorized users with active two-step verification (2FA) to query, generate, and view detailed financial reports and automated insights without requiring assistance from client support.

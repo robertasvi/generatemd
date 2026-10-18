@@ -62,10 +62,10 @@ export const TEMPLATES: GeneratorTemplate[] = [
     ],
     questions: [
       { id: 'project', title: 'Operational Purpose & Scope', label: 'Project description and scope', type: 'textarea', placeholder: 'Internal invoicing web app for finance team' },
-      { id: 'stack', title: '1. Stack & Architectural Guidance', label: 'Technology stack', type: 'textarea', placeholder: 'TypeScript, Angular 18\nBuild: npm run build' },
-      { id: 'styling', title: '2. Design principles and Style Guidance', label: 'Styling and design', type: 'textarea', placeholder: 'Tailwind CSS, follow the company design system' },
-      { id: 'testing', title: '3. Testing Standards', label: 'Testing standards', type: 'textarea', placeholder: 'Unit tests with Jest, e2e with Playwright' },
-      { id: 'rules', title: '4. Rules and Workflow checklist', label: 'Rules, architectural guidance and workflow checklist', type: 'textarea', placeholder: 'Use standalone components\nNever commit secrets' },
+      { id: 'stack', title: 'Stack & Architectural Guidance', label: 'Technology stack', type: 'textarea', placeholder: 'TypeScript, Angular 18\nBuild: npm run build' },
+      { id: 'styling', title: 'Design principles and Style Guidance', label: 'Styling and design', type: 'textarea', placeholder: 'Tailwind CSS, follow the company design system' },
+      { id: 'testing', title: 'Testing Standards', label: 'Testing standards', type: 'textarea', placeholder: 'Unit tests with Jest, e2e with Playwright' },
+      { id: 'rules', title: 'Rules and Workflow checklist', label: 'Rules, architectural guidance and workflow checklist', type: 'textarea', placeholder: 'Use standalone components\nNever commit secrets' },
     ],
     generate: answers => {
       const parts = TEMPLATES[0].questions.map(question => {
