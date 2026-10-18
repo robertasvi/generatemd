@@ -21,10 +21,10 @@ test.describe('Financial Self-Service Report Generation', () => {
 });
 ```
 
-Flakiness Prevention 
+### Flakiness Prevention 
 
 Use Playwright auto-waiting assertions (toBeVisible(), toHaveURL()) rather than arbitrary page.waitForTimeout().
 
-Accessibility Tests
+### Accessibility Tests
 
 Include basic axe-playwright checks on report tables to guarantee accessible colors, screen-reader table headers, and keyboard navigation.
