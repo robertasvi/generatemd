@@ -1,0 +1,3 @@
+[submodule ".github/agents"]
+	path = .github/agents
+	url = https://github.com/robertasvi/agents.git
